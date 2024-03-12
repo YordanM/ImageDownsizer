@@ -1,6 +1,6 @@
 ﻿namespace ImageDownsizer
 {
-    partial class Form1
+    partial class DownsizerForm
     {
         /// <summary>
         ///  Required designer variable.

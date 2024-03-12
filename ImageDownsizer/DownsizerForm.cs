@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace ImageDownsizer
 {
-    public partial class Form1 : Form
+    public partial class DownsizerForm : Form
     { 
         Bitmap originalImage;
 
-        public Form1()
+        public DownsizerForm()
         {
             InitializeComponent();
         }
