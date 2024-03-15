@@ -130,6 +130,10 @@ namespace ImageDownsizer
 
 
         // using pixel averaging algorithm
+        //https://stackoverflow.com/questions/1068373/how-to-calculate-the-average-rgb-color-values-of-a-bitmap
+        // this shows us how to calculate the average color the whole bitmap
+        // in my solution I reworked it to work with 2x2 matrix of colors
+        // this creating a new pixel with the average color and adding it to the new image
         public static Bitmap PixelAveraging(Bitmap originalBitmap, double downscalePercentage)
         { 
             Color[,] originalPixels = GetPixels(originalBitmap);
