@@ -18,7 +18,7 @@ namespace ImageDownsizer
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
 
-            string imagePath = Path.Combine(projectDirectory, "images\\original.jpg");
+            string imagePath = Path.Combine(projectDirectory, "images\\test2.jpg");
 
             originalImage = new Bitmap(imagePath);
 
@@ -36,7 +36,7 @@ namespace ImageDownsizer
                 return;
             }
 
-            Bitmap resizedImage = Downsizer.Bilinear(originalImage, scaleFactor);
+            Bitmap resizedImage = Downsizer.PixelAveraging(originalImage, scaleFactor);
 
             string outputPath = Path.Combine(projectDirectory, "images\\downsized_sequential.jpg");
 

@@ -71,6 +71,8 @@ namespace ImageDownsizer
 
             return bitmap;
         }
+
+
         private static byte Interpolate(byte a, byte b, byte c, byte d, double xWeight, double yWeight)
         {
             return (byte)(a * (1 - xWeight) * (1 - yWeight) +
@@ -79,6 +81,9 @@ namespace ImageDownsizer
                            d * xWeight * yWeight);
         }
 
+
+        // used source https://stackoverflow.com/questions/50346821/c-sharp-bilinear-interpolation-rgb
+        // using bilinear interpolation but it is not appropriate for downscaling more than 50%
         public static Bitmap Bilinear(Bitmap originalBitmap, double factor)
         {
             Color[,] original = GetPixels(originalBitmap);
@@ -100,13 +105,13 @@ namespace ImageDownsizer
 
                     Color topLeft = original[originalX, originalY];
 
-                    Color topRight = originalX + 1 >= original.GetLength(0) 
+                    Color topRight = originalX + 1 >= original.GetLength(0)
                         ? topLeft : original[originalX + 1, originalY];
 
-                    Color bottomLeft = originalY + 1 >= original.GetLength(1) 
+                    Color bottomLeft = originalY + 1 >= original.GetLength(1)
                         ? topLeft : original[originalX, originalY + 1];
 
-                    Color bottomRight = (originalX + 1 >= original.GetLength(0) || originalY + 1 >= original.GetLength(1)) 
+                    Color bottomRight = (originalX + 1 >= original.GetLength(0) || originalY + 1 >= original.GetLength(1))
                         ? topLeft : original[originalX + 1, originalY + 1];
 
                     double xWeight = (x * scaleX) - originalX;
@@ -121,6 +126,55 @@ namespace ImageDownsizer
             }
 
             return GetBitmap(result);
+        }
+
+
+        // using pixel averaging algorithm
+        public static Bitmap PixelAveraging(Bitmap originalBitmap, double downscalePercentage)
+        { 
+            Color[,] originalPixels = GetPixels(originalBitmap);
+
+            int newWidth = (int)(originalPixels.GetLength(0) * downscalePercentage / 100);
+            int newHeight = (int)(originalPixels.GetLength(1) * downscalePercentage / 100);
+
+            Color[,] resizedPixels = new Color[newWidth, newHeight];
+
+            for (int y = 0; y < newHeight; y++)
+            {
+                for (int x = 0; x < newWidth; x++)
+                {
+                    // get 2x2 from original image
+                    int originalXStart = x * originalPixels.GetLength(0) / newWidth;
+                    int originalXEnd = (x + 1) * originalPixels.GetLength(0) / newWidth;
+                    int originalYStart = y * originalPixels.GetLength(1) / newHeight;
+                    int originalYEnd = (y + 1) * originalPixels.GetLength(1) / newHeight;
+
+                    int redSum = 0;
+                    int greenSum = 0;
+                    int blueSum = 0;
+                    int pixelCount = 0;
+
+                    for (int originalY = originalYStart; originalY < originalYEnd; originalY++)
+                    {
+                        for (int originalX = originalXStart; originalX < originalXEnd; originalX++)
+                        {
+                            Color originalColor = originalPixels[originalX, originalY];
+                            redSum += originalColor.R;
+                            greenSum += originalColor.G;
+                            blueSum += originalColor.B;
+                            pixelCount++;
+                        }
+                    }
+
+                    int averageRed = redSum / pixelCount;
+                    int averageGreen = greenSum / pixelCount;
+                    int averageBlue = blueSum / pixelCount;
+
+                    resizedPixels[x, y] = Color.FromArgb(averageRed, averageGreen, averageBlue);
+                }
+            }
+
+            return GetBitmap(resizedPixels);
         }
     }
 }
