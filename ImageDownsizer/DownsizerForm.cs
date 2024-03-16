@@ -1,11 +1,13 @@
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace ImageDownsizer
 {
     public partial class DownsizerForm : Form
-    { 
+    {
         Bitmap originalImage;
 
         public DownsizerForm()
@@ -15,13 +17,6 @@ namespace ImageDownsizer
 
         private void downsizebtn_Click(object sender, EventArgs e)
         {
-            string workingDirectory = Environment.CurrentDirectory;
-            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-
-            string imagePath = Path.Combine(projectDirectory, "images\\test2.jpg");
-
-            originalImage = new Bitmap(imagePath);
-
             if (originalImage == null)
             {
                 MessageBox.Show("Please select an image first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -36,11 +31,32 @@ namespace ImageDownsizer
                 return;
             }
 
-            Bitmap resizedImage = Downsizer.PixelAveraging(originalImage, scaleFactor);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
-            string outputPath = Path.Combine(projectDirectory, "images\\downsized_sequential.jpg");
+            Threader.SingleThread(originalImage, scaleFactor);
 
-            resizedImage.Save(outputPath,ImageFormat.Jpeg);
+            consequentialTB.Text = sw.Elapsed.ToString();
+            sw.Restart();
+
+            Threader.MulthiThread(originalImage, scaleFactor);
+            parallelTB.Text = sw.Elapsed.ToString();
+
+            GC.Collect();
+        }
+
+        private void addImageBtn_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fd = new OpenFileDialog();
+
+            if (fd.ShowDialog() == DialogResult.OK)
+            {
+                string imagePath = fd.FileName;
+
+                originalImage = new Bitmap(imagePath);
+
+                imageBox.Image = originalImage;
+            }
         }
     }
 }

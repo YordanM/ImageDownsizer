@@ -135,7 +135,7 @@ namespace ImageDownsizer
         // in my solution I reworked it to work with 2x2 matrix of colors
         // this creating a new pixel with the average color and adding it to the new image
         public static Bitmap PixelAveraging(Bitmap originalBitmap, double downscalePercentage)
-        { 
+        {
             Color[,] originalPixels = GetPixels(originalBitmap);
 
             int newWidth = (int)(originalPixels.GetLength(0) * downscalePercentage / 100);
